@@ -1,4 +1,5 @@
 ﻿using ApiProyectoMaster.Repositories;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using NuggetModelsPryectoJalt;
 using System;
@@ -37,14 +38,10 @@ namespace ApiProyectoMaster.Controllers
             return this.repo.GetVApuntadosByTorneo(idtorneo, posicion);
         }
 
-        [HttpGet("[action]")]
-        public ActionResult<List<VistaApuntadosTorneo>> GetApuntadosAdmin()
-        {
-            return this.repo.GetVApuntados();
-        }
+  
 
         [HttpGet("[action]/{idtorneo}")]
-        public ActionResult<List<VistaApuntadosTorneo>> GetApuntadosAdminByTorneo(int idtorneo)
+        public ActionResult<List<VistaApuntadosTorneo>> GetVApuntadosNoPagByTorneo(int idtorneo)
         {
             return this.repo.GetVApuntadosByTorneoNoPag(idtorneo);
         }
@@ -63,9 +60,11 @@ namespace ApiProyectoMaster.Controllers
         }
 
         [HttpPost("[action]")]
+        [Authorize]
         public ActionResult InsertApuntado(Apuntado apuntado)
         {
             int maxid = this.repo.GetApuntadoMaxId();
+            this.repo.SumarApuntado(apuntado.IdTorneo);
             this.repo.InsertApuntado(maxid, apuntado.IdTorneo, apuntado.IdJugador
                 , apuntado.Puesto, apuntado.Record, apuntado.Seed);
             return Ok();
@@ -85,5 +84,13 @@ namespace ApiProyectoMaster.Controllers
             this.repo.DeleteApuntado(idapuntado);
             return Ok();
         }
+
+        [HttpGet("[action]")]
+        public ActionResult<int> GetMaxId()
+        {
+            int maxidjug = this.repo.GetApuntadoMaxId();
+            return maxidjug;
+        }
+
     }
 }

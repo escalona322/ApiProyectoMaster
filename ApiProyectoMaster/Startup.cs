@@ -1,4 +1,5 @@
 using ApiProyectoMaster.Data;
+using ApiProyectoMaster.Helpers;
 using ApiProyectoMaster.Repositories;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -35,10 +36,16 @@ namespace ApiProyectoMaster
             services.AddDbContext<TorneosContext>
                 (options => options.UseSqlServer(cadena));
 
+            HelperOAuthToken helper = new HelperOAuthToken(this.Configuration);
+            services.AddAuthentication(helper.GetAuthenticationOptions())
+                .AddJwtBearer(helper.GetJwtOptions());
+            services.AddTransient<HelperOAuthToken>
+        (x => helper);
+
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "ApiProyectoMaster", Version = "v1" });
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "ApiTickesPracticaAzure", Version = "v1" });
             });
         }
 
@@ -48,9 +55,13 @@ namespace ApiProyectoMaster
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-                app.UseSwagger();
-                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "ApiProyectoMaster v1"));
             }
+            app.UseSwagger();
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "ApiProyectoMaster v1");
+                c.RoutePrefix = "";
+            });
 
             app.UseHttpsRedirection();
 

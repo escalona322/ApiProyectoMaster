@@ -175,7 +175,7 @@ namespace ApiProyectoMaster.Repositories
             public int GetTorneoMaxId()
             {
                 int idmax = this.context.Torneos.Max(x => x.IdTorneo);
-                return idmax;
+                return idmax +1 ;
             }
             public void SumarApuntado(int idtorneo)
             {
@@ -288,6 +288,13 @@ namespace ApiProyectoMaster.Repositories
                 List<VistaSetFormateado> Sets = consulta.ToList();
 
                 return Sets;
+            }
+
+            public void DeleteSet(int idset)
+            {        
+                Set setElim = this.GetSetById(idset);
+                this.context.Sets.Remove(setElim);
+                this.context.SaveChanges();            
             }
             #endregion
 
@@ -421,7 +428,9 @@ namespace ApiProyectoMaster.Repositories
                                select datos;
                 return consulta.SingleOrDefault();
             }
-            public void InsertJugador(int idjugador, string nick, string region, string nombre, string email, string password, string rol, string equipo)
+            public void InsertJugador(int idjugador, string nick, string region,
+                string nombre, string email, string password,
+                string rol, string equipo)
             {
                 Jugador JugadorNuevo = new Jugador
                 {
@@ -437,7 +446,9 @@ namespace ApiProyectoMaster.Repositories
                 this.context.Jugadores.Add(JugadorNuevo);
                 this.context.SaveChanges();
             }
-            public void UpdateJugador(int idjugador, string nick, string region, string nombre, string email, string rol, string equipo)
+            public void UpdateJugador(int idjugador, string nick,
+                string region, string nombre, string email,
+                string rol, string equipo)
             {
                 Jugador JugadorEditar = this.GetJugadorById(idjugador);
                 JugadorEditar.Nick = nick;
@@ -451,7 +462,7 @@ namespace ApiProyectoMaster.Repositories
             public int GetJugadorMaxId()
             {
                 int idmax = this.context.Jugadores.Max(x => x.IdJugador);
-                return idmax;
+                return idmax + 1;
             }
 
             public Jugador ExisteJugador(string email, string password)

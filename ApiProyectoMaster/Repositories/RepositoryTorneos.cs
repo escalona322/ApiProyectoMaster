@@ -1,10 +1,14 @@
 ﻿using ApiProyectoMaster.Data;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 using NuggetModelsPryectoJalt;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace ApiProyectoMaster.Repositories
@@ -473,6 +477,24 @@ namespace ApiProyectoMaster.Repositories
                                select datos;
                 return consulta.SingleOrDefault();
             }
+
+            public async Task EnviarMailRegistro(Jugador jugador)
+             {
+            string urlFlowInsert =
+              "https://prod-217.westeurope.logic.azure.com:443/workflows/fa835d517a684427940a81066b9c6317/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=sbnNUkp7Z_lQAC67uLjefN5AFbkFIE5rR13ARD7ba6k";
+            MediaTypeWithQualityHeaderValue Header = new MediaTypeWithQualityHeaderValue("application/json"); ;
+
+            using (HttpClient client = new HttpClient())
+              {
+                client.DefaultRequestHeaders.Accept.Clear();
+                client.DefaultRequestHeaders.Accept.Add(Header);
+                string json = JsonConvert.SerializeObject(jugador);
+                StringContent content =
+                    new StringContent(json, Encoding.UTF8, "application/json");
+                HttpResponseMessage response =
+                    await client.PostAsync(urlFlowInsert, content);
+            }
+        }
             #endregion
 
         }

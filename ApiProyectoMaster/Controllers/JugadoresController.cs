@@ -1,10 +1,13 @@
 ﻿using ApiProyectoMaster.Repositories;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using NuggetModelsPryectoJalt;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace ApiProyectoMaster.Controllers
@@ -60,6 +63,13 @@ namespace ApiProyectoMaster.Controllers
                 jugador.Password, jugador.Rol, jugador.Equipo);
             return Ok();
         }
+
+        [HttpPost("[action]")]
+        public async Task<ActionResult> EnviarMailJugador(Jugador jugador)
+        {
+            await this.repo.EnviarMailRegistro(jugador);
+            return Ok();
+        }
         [HttpPut("[action]")]
         public ActionResult UpdateJugador(Jugador jugador)
         {
@@ -81,6 +91,18 @@ namespace ApiProyectoMaster.Controllers
         {
             Jugador jug = this.repo.ExisteJugador(email, password);
             return jug;
+        }
+
+        [HttpGet("[action]")]
+        [Authorize]
+        public ActionResult<Jugador> PerfilJugador()
+        {
+            List<Claim> claims = HttpContext.User.Claims.ToList();
+
+            string jsonJugador = claims.SingleOrDefault(z => z.Type == "UserData").Value;
+
+            Jugador usu = JsonConvert.DeserializeObject<Jugador>(jsonJugador);
+            return usu;
         }
     }
 }
